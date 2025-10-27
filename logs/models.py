@@ -24,6 +24,53 @@ class DailyLog(models.Model):
     total_off_duty_hours = models.DecimalField(max_digits=5, decimal_places=2, default=0)
     total_sleeper_hours = models.DecimalField(max_digits=5, decimal_places=2, default=0)
 
+    def calculate_and_save_totals(self):
+        """
+        Calculates total hours for each activity type from related LogEntries
+        and updates the fields on the DailyLog.
+        """
+        
+        # Calculate the duration (end_hour - start_hour) for each entry
+        duration_expression = ExpressionWrapper(
+            F('end_hour') - F('start_hour'), 
+            output_field=DecimalField(max_digits=5, decimal_places=2)
+        )
+
+        # Aggregate durations based on activity type
+        aggregation = self.entries.annotate(
+            duration=duration_expression
+        ).values('activity_type').annotate(
+            total_duration=Sum('duration')
+        )
+
+        # Reset all totals to 0 before applying new sums
+        self.total_driving_hours = 0
+        self.total_on_duty_hours = 0
+        self.total_off_duty_hours = 0
+        self.total_sleeper_hours = 0
+
+        # Map the calculated totals back to the DailyLog fields
+        for item in aggregation:
+            activity = item['activity_type']
+            duration = item['total_duration']
+            
+            if activity == 'driving':
+                self.total_driving_hours = duration
+            elif activity == 'on_duty':
+                self.total_on_duty_hours = duration
+            elif activity == 'off_duty':
+                self.total_off_duty_hours = duration
+            elif activity == 'sleeper':
+                self.total_sleeper_hours = duration
+
+        # Save the updated DailyLog instance without recursively calling save
+        self.save(update_fields=[
+            'total_driving_hours', 
+            'total_on_duty_hours', 
+            'total_off_duty_hours', 
+            'total_sleeper_hours'
+        ])
+
     def __str__(self):
         return f"Log {self.date} - Trip {self.trip.id}"
 

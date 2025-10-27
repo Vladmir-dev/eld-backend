@@ -1,4 +1,3 @@
-# logs/views.py
 from rest_framework import viewsets
 from .models import DailyLog, LogEntry
 from .serializers import DailyLogSerializer, LogEntrySerializer
