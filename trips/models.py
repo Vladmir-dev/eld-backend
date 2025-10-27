@@ -4,7 +4,11 @@ from django.conf import settings
 class Trip(models.Model):
     user = models.ForeignKey(settings.AUTH_USER_MODEL, on_delete=models.CASCADE, related_name="trips")
     pickup_location = models.CharField(max_length=255)
+    pickup_latitude = models.FloatField(blank=True, null=True)
+    pickup_longitude = models.FloatField(blank=True, null=True)
     dropoff_location = models.CharField(max_length=255)
+    dropoff_latitude = models.FloatField(blank=True, null=True)
+    dropoff_longitude = models.FloatField(blank=True, null=True)
     current_location = models.CharField(max_length=255, blank=True, null=True)
     current_cycle_used = models.DecimalField(max_digits=5, decimal_places=2)
     start_date = models.DateTimeField()

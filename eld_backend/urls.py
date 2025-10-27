@@ -19,7 +19,7 @@ from django.urls import path, include
 from rest_framework import routers
 from users.views import UserViewSet
 from trips.views import TripViewSet
-from logs.views import DailyLogViewSet, LogEntryViewSet
+from logs.views import DailyLogViewSet, LogEntryViewSet, download_log_pdf
 # from rest_framework_simplejwt.views import TokenObtainPairView, TokenRefreshView
 from users.authentication import EmailTokenObtainPairView
 from rest_framework_simplejwt.views import TokenRefreshView
@@ -35,4 +35,5 @@ urlpatterns = [
     path('api/', include(router.urls)),
      path('api/token/', EmailTokenObtainPairView.as_view(), name='token_obtain_pair'),
     path('api/token/refresh/', TokenRefreshView.as_view(), name='token_refresh'),
+    path('api/logs/<int:pk>/pdf/', download_log_pdf, name='log-pdf'),
 ]
