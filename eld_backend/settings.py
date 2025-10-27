@@ -101,7 +101,7 @@ if os.environ.get('DATABASE_URL'):
         'default': dj_database_url.config(
             default=os.environ.get('DATABASE_URL'),
             conn_max_age=600,
-            conn_health_check=True,
+            conn_health_checks=True,
         )
     }
     # Security note: Use HTTPS connection if possible (e.g., 'ssl_require': True)
